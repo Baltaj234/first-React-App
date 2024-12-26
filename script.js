@@ -57,8 +57,12 @@ const Post = ({ title, content, likes, onLike, onDelete }) => (
     }, []);
 
     const addPost = (newPost) => {
-        setPosts([newPost, ...posts]);
-    };
+      // Add the post to the state
+      setPosts(prevPosts => [{ ...newPost, likes: 0 }, ...prevPosts]);
+      
+      // Perform a hard refresh after adding the post
+      window.location.reload();
+  };
 
     const handleLike = async (id) => {
         await fetch(`http://localhost:3001/api/posts/${id}/like`, {

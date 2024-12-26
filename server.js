@@ -33,13 +33,26 @@ app.get('/api/posts', (req, res) => {
 });
 
 // Create a new post
+// Create a new post
 app.post('/api/posts', (req, res) => {
   const { title, content } = req.body;
-  db.query('INSERT INTO posts (title, content) VALUES (?, ?)', [title, content], (err) => {
-    if (err) throw err;
-    res.status(201).json({ message: 'Post created successfully' });
+  db.query('INSERT INTO posts (title, content, likes) VALUES (?, ?, ?)', [title, content, 0], (err, result) => {
+      if (err) throw err;
+      // Fetch the newly created post
+      db.query('SELECT * FROM posts WHERE id = ?', [result.insertId], (err, results) => {
+          if (err) throw err;
+          // Ensure likes is explicitly set to 0
+          const postWithLikes = {
+              ...results[0],
+              likes: results[0].likes !== null ? results[0].likes : 0
+          };
+          res.status(201).json(postWithLikes);
+      });
   });
 });
+
+
+
 // Create a new endpoint to like a post
 app.post('/api/posts/:id/like', (req, res) => {
   const postId = req.params.id;
