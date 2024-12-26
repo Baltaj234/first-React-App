@@ -46,27 +46,39 @@ const Post = ({ title, content }) => (
   
   const App = () => {
     const [posts, setPosts] = React.useState([]);
-  
+    const [searchQuery, setSearchQuery] = React.useState(''); // New state for search query
+
     React.useEffect(() => {
-      fetch('http://localhost:3001/api/posts')
-        .then((res) => res.json())
-        .then((data) => setPosts(data));
+        fetch('http://localhost:3001/api/posts')
+            .then((res) => res.json())
+            .then((data) => setPosts(data));
     }, []);
-  
+
     const addPost = (newPost) => {
-      setPosts([newPost, ...posts]);
+        setPosts([newPost, ...posts]);
     };
-  
-    return (
-      <div>
-        <h1>First-React-App</h1>
-        <PostForm onAddPost={addPost} />
-        {posts.map((post) => (
-          <Post key={post.id} title={post.title} content={post.content} />
-        ))}
-      </div>
+
+    // Filter posts based on search query
+    const filteredPosts = posts.filter(post =>
+        post.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  };
+
+    return (
+        <div>
+            <h1>First-React-App</h1>
+            <input
+                type="text"
+                placeholder="Search by title"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)} // Update search query
+            />
+            <PostForm onAddPost={addPost} />
+            {filteredPosts.map((post) => (
+                <Post key={post.id} title={post.title} content={post.content} />
+            ))}
+        </div>
+    );
+};
   
   ReactDOM.createRoot(document.getElementById('root')).render(<App />);
   
