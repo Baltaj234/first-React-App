@@ -1,10 +1,11 @@
 // script.js
 
-const Post = ({ title, content, likes, onLike }) => (
+const Post = ({ title, content, likes, onLike, onDelete }) => (
   <div className="post">
       <h3>{title}</h3>
       <p>{content}</p>
       <button onClick={onLike}>Like {likes}</button>
+      <button onClick={onDelete}>Delete</button> {/* Add delete button */}
   </div>
 );
   
@@ -50,31 +51,32 @@ const Post = ({ title, content, likes, onLike }) => (
     const [searchQuery, setSearchQuery] = React.useState('');
 
     React.useEffect(() => {
-      fetch('http://localhost:3001/api/posts')
-          .then((res) => res.json())
-          .then((data) => {
-              // Initialize likes for each post from the database
-              setPosts(data); // Ensure this includes the likes from the database
-          });
-  }, []);
+        fetch('http://localhost:3001/api/posts')
+            .then((res) => res.json())
+            .then((data) => setPosts(data));
+    }, []);
 
     const addPost = (newPost) => {
-        const postWithLikes = { ...newPost, likes: 0 }; // Initialize likes for new post
-        setPosts([postWithLikes, ...posts]);
+        setPosts([newPost, ...posts]);
     };
 
     const handleLike = async (id) => {
-      // Send a request to the backend to like the post
-      await fetch(`http://localhost:3001/api/posts/${id}/like`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-      });
-  
-      // Update the local state to reflect the new like count
-      setPosts(posts.map(post => 
-          post.id === id ? { ...post, likes: post.likes + 1 } : post
-      ));
-  };
+        await fetch(`http://localhost:3001/api/posts/${id}/like`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        setPosts(posts.map(post => 
+            post.id === id ? { ...post, likes: post.likes + 1 } : post
+        ));
+    };
+
+    const handleDelete = async (id) => {
+        await fetch(`http://localhost:3001/api/posts/${id}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        setPosts(posts.filter(post => post.id !== id)); // Remove the deleted post from state
+    };
 
     const filteredPosts = posts.filter(post =>
         post.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -96,7 +98,8 @@ const Post = ({ title, content, likes, onLike }) => (
                     title={post.title} 
                     content={post.content} 
                     likes={post.likes} 
-                    onLike={() => handleLike(post.id)} // Pass the like handler
+                    onLike={() => handleLike(post.id)} 
+                    onDelete={() => handleDelete(post.id)} // Pass the delete handler
                 />
             ))}
         </div>

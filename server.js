@@ -49,6 +49,15 @@ app.post('/api/posts/:id/like', (req, res) => {
   });
 });
 
+// Delete a post
+app.delete('/api/posts/:id', (req, res) => {
+  const postId = req.params.id;
+  db.query('DELETE FROM posts WHERE id = ?', [postId], (err) => {
+      if (err) throw err;
+      res.status(200).json({ message: 'Post deleted successfully' });
+  });
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
