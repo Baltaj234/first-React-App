@@ -1,11 +1,12 @@
 // script.js
 
-const Post = ({ title, content }) => (
-    <div className="post">
+const Post = ({ title, content, likes, onLike }) => (
+  <div className="post">
       <h3>{title}</h3>
       <p>{content}</p>
-    </div>
-  );
+      <button onClick={onLike}>Like {likes}</button>
+  </div>
+);
   
   const PostForm = ({ onAddPost }) => {
     const [title, setTitle] = React.useState('');
@@ -46,19 +47,35 @@ const Post = ({ title, content }) => (
   
   const App = () => {
     const [posts, setPosts] = React.useState([]);
-    const [searchQuery, setSearchQuery] = React.useState(''); // New state for search query
+    const [searchQuery, setSearchQuery] = React.useState('');
 
     React.useEffect(() => {
-        fetch('http://localhost:3001/api/posts')
-            .then((res) => res.json())
-            .then((data) => setPosts(data));
-    }, []);
+      fetch('http://localhost:3001/api/posts')
+          .then((res) => res.json())
+          .then((data) => {
+              // Initialize likes for each post from the database
+              setPosts(data); // Ensure this includes the likes from the database
+          });
+  }, []);
 
     const addPost = (newPost) => {
-        setPosts([newPost, ...posts]);
+        const postWithLikes = { ...newPost, likes: 0 }; // Initialize likes for new post
+        setPosts([postWithLikes, ...posts]);
     };
 
-    // Filter posts based on search query
+    const handleLike = async (id) => {
+      // Send a request to the backend to like the post
+      await fetch(`http://localhost:3001/api/posts/${id}/like`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+      });
+  
+      // Update the local state to reflect the new like count
+      setPosts(posts.map(post => 
+          post.id === id ? { ...post, likes: post.likes + 1 } : post
+      ));
+  };
+
     const filteredPosts = posts.filter(post =>
         post.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -70,11 +87,17 @@ const Post = ({ title, content }) => (
                 type="text"
                 placeholder="Search by title"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)} // Update search query
+                onChange={(e) => setSearchQuery(e.target.value)}
             />
             <PostForm onAddPost={addPost} />
             {filteredPosts.map((post) => (
-                <Post key={post.id} title={post.title} content={post.content} />
+                <Post 
+                    key={post.id} 
+                    title={post.title} 
+                    content={post.content} 
+                    likes={post.likes} 
+                    onLike={() => handleLike(post.id)} // Pass the like handler
+                />
             ))}
         </div>
     );

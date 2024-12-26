@@ -40,6 +40,14 @@ app.post('/api/posts', (req, res) => {
     res.status(201).json({ message: 'Post created successfully' });
   });
 });
+// Create a new endpoint to like a post
+app.post('/api/posts/:id/like', (req, res) => {
+  const postId = req.params.id;
+  db.query('UPDATE posts SET likes = likes + 1 WHERE id = ?', [postId], (err) => {
+      if (err) throw err;
+      res.status(200).json({ message: 'Post liked successfully' });
+  });
+});
 
 // Start server
 app.listen(PORT, () => {
