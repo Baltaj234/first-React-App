@@ -34,3 +34,14 @@ CREATE TABLE posts (
 Be sure to install all dependencies of the project before using as it is crucial for you to run the server of this projecy.
 after they are installed type node server.js in the terminal and open the html file in the browser.
 If everything was done correctly you should be able to use the app and create posts.
+
+Also the latest feature is the comments feature, this is the database schema for the comments to work:
+
+CREATE TABLE comments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  post_id INT NOT NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+);
+
