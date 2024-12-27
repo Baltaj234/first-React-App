@@ -16,43 +16,82 @@ h1 {
 }
 
 .post-form {
-    margin: 20px auto;
-    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
     max-width: 400px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #fff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    width: 100%;
+    margin: 0 auto;
+    transition: all 0.3s ease;
 }
 
-.post-form input,
+.post-form input[type="text"] {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.post-form input[type="text"]:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
 .post-form textarea {
     width: 100%;
-    margin: 10px 0;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    min-height: 200px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
     font-size: 16px;
-    box-sizing: border-box;
+    resize: vertical;
+    line-height: 1.6;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.post-form textarea:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
 }
 
 .post-form button {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    background-color: #0079d3;
+    background-color: #4a90e2;
     color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
     font-size: 16px;
-    border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
+    width: 100%;
 }
 
 .post-form button:hover {
-    background-color: #005999;
+    background-color: #357abd;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+}
+
+/* Placeholder Styling */
+.post-form input[type="text"]::placeholder,
+.post-form textarea::placeholder {
+    color: #a0a0a0;
+    font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .post-form {
+        padding: 20px;
+        width: 95%;
+    }
 }
 
 .posts-container {

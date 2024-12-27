@@ -61,7 +61,7 @@ const Post = ({ id, title, content, likes, onLike, onDelete, onEdit }) => {
     };
   // handling sumbmition
     return (
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="post-form">
         <input
           type="text"
           placeholder="Post Title"
@@ -74,6 +74,7 @@ const Post = ({ id, title, content, likes, onLike, onDelete, onEdit }) => {
           onChange={(e) => setContent(e.target.value)}
         ></textarea>
         <button type="submit">Add Post</button>
+        <h3> Posts Below!!</h3>
       </form>
     );
   };
