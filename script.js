@@ -1,13 +1,45 @@
 // script.js
 
-const Post = ({ title, content, likes, onLike, onDelete }) => (
-  <div className="post">
-      <h3>{title}</h3>
-      <p>{content}</p>
-      <button onClick={onLike}>Like {likes}</button>
-      <button onClick={onDelete}>Delete</button> {/* Add delete button */}
-  </div>
-);
+const Post = ({ id, title, content, likes, onLike, onDelete, onEdit }) => {
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editTitle, setEditTitle] = React.useState(title);
+  const [editContent, setEditContent] = React.useState(content);
+
+  const handleEdit = () => {
+    onEdit(id, editTitle, editContent);
+    setIsEditing(false);
+  };
+
+  return (
+    <div className="post">
+      {isEditing ? (
+        <>
+          <input
+            type="text"
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+          />
+          <textarea
+            value={editContent}
+            onChange={(e) => setEditContent(e.target.value)}
+          ></textarea>
+          <button onClick={handleEdit}>Save</button>
+          <button onClick={() => setIsEditing(false)}>Cancel</button>
+        </>
+      ) : (
+        <>
+          <h3>{title}</h3>
+          <p>{content}</p>
+          <button onClick={onLike}>Like {likes}</button>
+          <button onClick={onDelete}>Delete</button>
+          <button onClick={() => setIsEditing(true)}>Edit</button>
+        </>
+      )}
+    </div>
+  );
+};
+
+// the post form
   
   const PostForm = ({ onAddPost }) => {
     const [title, setTitle] = React.useState('');
@@ -27,7 +59,7 @@ const Post = ({ title, content, likes, onLike, onDelete }) => (
       setTitle('');
       setContent('');
     };
-  
+  // handling sumbmition
     return (
       <form onSubmit={handleSubmit}>
         <input
@@ -82,6 +114,19 @@ const Post = ({ title, content, likes, onLike, onDelete }) => (
         setPosts(posts.filter(post => post.id !== id)); // Remove the deleted post from state
     };
 
+    //handling the edit
+
+    const handleEdit = async (id, newTitle, newContent) => {
+      await fetch(`http://localhost:3001/api/posts/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: newTitle, content: newContent }),
+      });
+      setPosts(posts.map(post => 
+        post.id === id ? { ...post, title: newTitle, content: newContent } : post
+      ));
+    };
+
     const filteredPosts = posts.filter(post =>
         post.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -99,11 +144,13 @@ const Post = ({ title, content, likes, onLike, onDelete }) => (
             {filteredPosts.map((post) => (
                 <Post 
                     key={post.id} 
+                    id = {post.id}
                     title={post.title} 
                     content={post.content} 
                     likes={post.likes} 
                     onLike={() => handleLike(post.id)} 
                     onDelete={() => handleDelete(post.id)} // Pass the delete handler
+                    onEdit={handleEdit}
                 />
             ))}
         </div>

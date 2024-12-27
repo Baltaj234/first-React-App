@@ -32,7 +32,7 @@ app.get('/api/posts', (req, res) => {
   });
 });
 
-// Create a new post
+
 // Create a new post
 app.post('/api/posts', (req, res) => {
   const { title, content } = req.body;
@@ -51,6 +51,16 @@ app.post('/api/posts', (req, res) => {
   });
 });
 
+// editing a post endpoint
+// Update a post
+app.put('/api/posts/:id', (req, res) => {
+  const postId = req.params.id;
+  const { title, content } = req.body;
+  db.query('UPDATE posts SET title = ?, content = ? WHERE id = ?', [title, content, postId], (err) => {
+    if (err) throw err;
+    res.status(200).json({ message: 'Post updated successfully' });
+  });
+});
 
 
 // Create a new endpoint to like a post
