@@ -81,6 +81,40 @@ app.delete('/api/posts/:id', (req, res) => {
   });
 });
 
+// all the routes for comments
+
+// Fetch comments for a specific post
+app.get('/api/posts/:id/comments', (req, res) => {
+  const postId = req.params.id;
+  db.query('SELECT * FROM comments WHERE post_id = ? ORDER BY created_at DESC', [postId], (err, results) => {
+    if (err) throw err;
+    res.json(results);
+  });
+});
+
+// Create a new comment
+app.post('/api/posts/:id/comments', (req, res) => {
+  const postId = req.params.id;
+  const { content } = req.body;
+  db.query('INSERT INTO comments (post_id, content) VALUES (?, ?)', [postId, content], (err, result) => {
+    if (err) throw err;
+    // Fetch the newly created comment to return full details
+    db.query('SELECT * FROM comments WHERE id = ?', [result.insertId], (err, commentResults) => {
+      if (err) throw err;
+      res.status(201).json(commentResults[0]);
+    });
+  });
+});
+
+// Delete a comment
+app.delete('/api/comments/:id', (req, res) => {
+  const commentId = req.params.id;
+  db.query('DELETE FROM comments WHERE id = ?', [commentId], (err) => {
+    if (err) throw err;
+    res.status(200).json({ message: 'Comment deleted successfully' });
+  });
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

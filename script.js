@@ -1,39 +1,60 @@
 // script.js
 
 const Post = ({ id, title, content, likes, onLike, onDelete, onEdit }) => {
-  const [isEditing, setIsEditing] = React.useState(false);
-  const [editTitle, setEditTitle] = React.useState(title);
-  const [editContent, setEditContent] = React.useState(content);
+  const [comments, setComments] = React.useState([]);
+  const [showComments, setShowComments] = React.useState(false);
 
-  const handleEdit = () => {
-    onEdit(id, editTitle, editContent);
-    setIsEditing(false);
+  // Fetch comments when comments section is expanded
+  React.useEffect(() => {
+    if (showComments) {
+      fetch(`http://localhost:3001/api/posts/${id}/comments`)
+        .then((res) => res.json())
+        .then((data) => setComments(data));
+    }
+  }, [showComments, id]);
+
+  const toggleComments = () => {
+    setShowComments(!showComments);
+  };
+
+  const addComment = (newComment) => {
+    setComments((prevComments) => [newComment, ...prevComments]);
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    await fetch(`http://localhost:3001/api/comments/${commentId}`, {
+      method: 'DELETE',
+    });
+    setComments(comments.filter(comment => comment.id !== commentId));
   };
 
   return (
     <div className="post">
-      {isEditing ? (
-        <>
-          <input
-            type="text"
-            value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
-          />
-          <textarea
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-          ></textarea>
-          <button onClick={handleEdit}>Save</button>
-          <button onClick={() => setIsEditing(false)}>Cancel</button>
-        </>
-      ) : (
-        <>
-          <h3>{title}</h3>
-          <p>{content}</p>
-          <button onClick={onLike}>Like {likes}</button>
-          <button onClick={onDelete}>Delete</button>
-          <button onClick={() => setIsEditing(true)}>Edit</button>
-        </>
+      <h3>{title}</h3>
+      <p>{content}</p>
+      <button onClick={onLike}>Like {likes}</button>
+      <button onClick={onDelete}>Delete</button>
+      <button onClick={toggleComments}>
+        {showComments ? 'Hide Comments' : 'Show Comments'}
+      </button>
+
+      {showComments && (
+        <div className="comments-section">
+          <CommentForm postId={id} onAddComment={addComment} />
+          
+          {comments.length > 0 ? (
+            comments.map(comment => (
+              <Comment 
+                key={comment.id} 
+                id={comment.id} 
+                content={comment.content} 
+                onDelete={() => handleDeleteComment(comment.id)} 
+              />
+            ))
+          ) : (
+            <p>No comments yet. Be the first to comment!</p>
+          )}
+        </div>
       )}
     </div>
   );
@@ -156,6 +177,58 @@ const Post = ({ id, title, content, likes, onLike, onDelete, onEdit }) => {
             ))}
         </div>
     );
+};
+
+// the comment component
+
+// Comment Component
+const Comment = ({ id, content, onDelete }) => {
+  return (
+    <div className="comment">
+      <p>{content}</p>
+      <button onClick={onDelete}>Delete</button>
+    </div>
+  );
+};
+
+// Comment Form Component
+const CommentForm = ({ postId, onAddComment }) => {
+  const [content, setContent] = React.useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!content.trim()) return;
+
+    try {
+      const response = await fetch(`http://localhost:3001/api/posts/${postId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to post comment');
+      }
+
+      const newComment = await response.json();
+      onAddComment(newComment);
+      setContent('');
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      alert('Failed to add comment');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="comment-form">
+      <textarea
+        placeholder="Add a comment..."
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+      ></textarea>
+      <button type="submit">Post Comment</button>
+    </form>
+  );
 };
   
   ReactDOM.createRoot(document.getElementById('root')).render(<App />);
