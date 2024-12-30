@@ -62,43 +62,54 @@ const Post = ({ id, title, content, likes, onLike, onDelete, onEdit }) => {
 
 // the post form
   
-  const PostForm = ({ onAddPost }) => {
-    const [title, setTitle] = React.useState('');
-    const [content, setContent] = React.useState('');
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      if (!title || !content) return;
-  
-      await fetch('http://localhost:3001/api/posts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, content }),
-      });
-  
-      onAddPost({ title, content });
-      setTitle('');
-      setContent('');
-    };
-  // handling sumbmition
-    return (
-      <form onSubmit={handleSubmit} className="post-form">
-        <input
-          type="text"
-          placeholder="Post Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <textarea
-          placeholder="Post Content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        ></textarea>
-        <button type="submit">Add Post</button>
-        <h3> Posts Below!!</h3>
-      </form>
-    );
+const PostForm = ({ onAddPost }) => {
+  const [title, setTitle] = React.useState('');
+  const [content, setContent] = React.useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!title || !content) return;
+
+    await fetch('http://localhost:3001/api/posts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, content }),
+    });
+
+    onAddPost({ title, content });
+    setTitle('');
+    setContent('');
   };
+
+  return (
+    <div className="container mt-4">
+      <form onSubmit={handleSubmit} className="post-form shadow p-4 rounded bg-light">
+        <h2 className="mb-4 text-center">Create a New Post</h2>
+        <div className="mb-3">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Post Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+        <div className="mb-3">
+          <textarea
+            className="form-control"
+            rows="5"
+            placeholder="Post Content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+          ></textarea>
+        </div>
+        <button type="submit" className="btn btn-primary w-100">Add Post</button>
+        <h3 className="mt-4 text-center">Posts Below!!</h3>
+      </form>
+    </div>
+  );
+};
+
   
   const App = () => {
     const [posts, setPosts] = React.useState([]);
