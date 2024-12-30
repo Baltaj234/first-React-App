@@ -45,3 +45,7 @@ CREATE TABLE comments (
   FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
 );
 
+Styling 
+
+This project uses a combination of a CSS stylesheets as well as bootstrap. Stylesheets are used for the post elements and bootstrap is used for the post form component to make it more efficient in terms of scale and UI design. Posts are mainly styled via the stylesheet and follow a red theme with a white container, the same goes for the comments, they are kept very similar in design for a clear user interface. Styling this project toook time and careful attention to detail, making it responsive was easily achieved by bootstrap. This framework made the whole styling easier to code.
+
