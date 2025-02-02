@@ -1,6 +1,6 @@
-# Reddit Clone
+# Displays posts and comments
 
-A simple Reddit clone built with React, Express, and MySQL. This app allows users to post content and view each other's posts.
+A simple web appe built with React, Express, and MySQL. This app allows users to post content and view each other's posts.
 
 ## Features
 
